@@ -35,11 +35,10 @@ def one_course(cid:str,ctype:str,crate:int):
             if crate == 100:
                 print('当前课程已完成')
                 cur_page.close_tabs(tabs_or_ids=[tab])
-            # 进入后，获得当前视频的完成率
-            try:
-                if tab.ele('tag:a@@text():继续学习'):
-                    tab.ele('tag:a@@text():继续学习').click()
-            except BaseException:
+            # 进入后，获得当前视频的完成率,决定操作方式
+            if tab.ele('tag:a@@text():继续学习',timeout=2):
+                tab.ele('tag:a@@text():继续学习').click()
+            else:
                 tab.ele('c:#normalModel_video > xg-start > div.xgplayer-icon-play > svg > path').click()
             # 建立循环，检测当前视频是否完播
             '''
@@ -48,7 +47,7 @@ def one_course(cid:str,ctype:str,crate:int):
             '''
             l = []
             while 1:
-                # 想要加一个定时刷新的功能方便释放内存
+                # todo:想要加一个定时刷新的功能方便释放内存
                 watch_rates = tab.ele('#normalModel_nodeList').eles('tag:span')
                 for watch_rate in watch_rates:
                     l.append(int(watch_rate.text[:-1]))
@@ -58,7 +57,13 @@ def one_course(cid:str,ctype:str,crate:int):
                 if l == [100]*len(l):
                     # 关闭当前标签页
                     cur_page.close_tabs(tabs_or_ids=[tab])
-                time.sleep(5)
+                '''
+                由于视频播完后会自动暂停，所以需要检测是否播放完毕以准备下一步操作
+                解决方案：检测列表中首个不是0的元素的索引，根据索引点击对应的视频，并尝试检测是否有播放按钮来区分正在播放和播放完毕
+                '''
+                # 睡觉了，明天继续:)
+                time.sleep(60) # 每次监测间隔60秒
+
             break
 if __name__ == '__main__':
     one_course('6992','培训',68)
