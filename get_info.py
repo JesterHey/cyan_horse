@@ -1,10 +1,12 @@
 from DrissionPage import WebPage
 from DrissionPage.common import *
+from collections import *
 import time
 import json
 # http://hnqmgc.17el.cn/grzx/
 
-
+def decode(s):
+    return json.loads('"%s"' %s) # 由于页面源码中的json字符串是单引号包裹的，所以需要转换成双引号包裹的json字符串
 # 创建页面对象，并启动或接管浏览器
 page = WebPage()
 # 跳转到登录页面
@@ -31,7 +33,8 @@ page.ele('@value=0').click()
 # 获取总页数
 course_info = {}
 # <div class="paginationjs-nav J-paginationjs-nav">1 / 4</div>
-total_page = int(page.ele('.paginationjs-nav J-paginationjs-nav').text[-1])
+# total_page = int(page.ele('.paginationjs-nav J-paginationjs-nav').text)
+total_page = 4
 for i in range(total_page):
     # 逐页读取课程信息和完成状态并存放到字典中
     tbodys = page.ele('#tbody')
@@ -39,16 +42,18 @@ for i in range(total_page):
     trs = tbodys.eles('tag:tr')
     for tr in trs:
         cur_info = tr.text.split('\t')
-        print(cur_info)
-        course_id = cur_info[0] # 课程id
-        course_rate = cur_info[3] # 课程完成百分比
-        course_status = cur_info[4] # 课程完成状态(是否完成习题/评价)
+        course_id = cur_info[0]  # 课程id
+        course_type = cur_info[2] # 课程类型
+        course_rate = int(cur_info[3][:-1])  # 课程完成百分比
+        course_status = cur_info[4]  # 课程完成状态(是否完成习题/评价)
+        print(course_id, course_rate, course_status)
         # 存放到字典中
-        course_info[course_id] = {'rate': course_rate, 'status': course_status}
+        course_info[course_id] = {'rate': course_rate,'type': course_type,'status': course_status}
     if i != total_page - 1:
-        page.ele('@type=text').input(i + 2)
-        page.ele('@value=跳转').click()
+        page.ele('@title=Next page').click()
         time.sleep(1)
 print(len(course_info))
-page.close_session()
+# 写入json文件中
+with open('course_info.json', 'w') as f:
+    json.dump(course_info, f)
 
