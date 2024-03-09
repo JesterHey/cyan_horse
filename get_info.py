@@ -10,7 +10,7 @@ def decode(s):
 # 创建页面对象，并启动或接管浏览器
 page = WebPage()
 # 跳转到登录页面
-page.get('http://hnqmgc.17el.cn/grzx/')
+page.get('http://hnqmgc.17el.cn/grzx/',retry=5,timeout=5,interval=1)
 
 # 定位到账号文本框，获取文本框元素
 ele = page.ele('#userName') # #的意思是通过id定位元素
