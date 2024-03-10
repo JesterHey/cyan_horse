@@ -39,4 +39,23 @@ for k, v in new_cnt.items():
 
 # 若上述检验通过，则重新读取课程信息并检验是否存在未答题或者未评分的课程
 new_cnt = new_info()
-# 睡午觉了，下午写吧，哈哈
+not_judged = []
+not_quiz = []
+for k, v in new_cnt.items():
+    if v['status'] == '已完成':
+        continue
+    if v['status'] == '未评分':
+        not_judged.append(k)
+    else:
+        not_quiz.append(k)
+
+# 展示提示信息
+for i in not_judged:
+    logger.warning('存在未评分的课程:{}'.format(i))
+# 实现自动评分
+def auto_judge(course_id:str) -> None:
+    pass
+for i in not_judged:
+    logger.warning('存在未答题的课程:{}'.format(i))
+# 实现自动答题
+pass

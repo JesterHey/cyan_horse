@@ -72,8 +72,17 @@ def one_course(cid:str,ctype:str,crate:int,again:bool=False):
                     break
                 '''
                 由于视频播完后会自动暂停，所以需要检测是否播放完毕以准备下一步操作
+                有多个小节会提示是否进入下一小节，所以需要检测是否有进入下一小节的按钮
                 解决方案:检测列表中首个不是100的元素的索引,根据索引点击对应的视频,并尝试检测是否有播放按钮来区分正在播放和播放完毕
                 '''
+
+                # 每60秒先检测是否有视频播放完毕
+                try:
+                    if tab.ele('tag:div@@text():本小结已经学习完，是否进入下一节？',timeout=2):
+                        tab.ele('tag:a@@text():是').click()
+                except:
+                    pass
+                # 有时候没有弹窗提示，用以下方式手动检测
                 for i in l:
                     if i != 100:
                         tab.ele('#normalModel_nodeList').eles('tag:div')[l.index(i)].click()
