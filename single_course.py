@@ -1,15 +1,21 @@
 from DrissionPage import ChromiumPage
 from DrissionPage.common import *
 import time
+from loguru import logger
 # 实现单个课程的刷课逻辑
-'''
-接受一个课程id,执行刷课
-1. 跳转到对应课程页面
-2. 进入相应的课程界面
-3. 循环检验课程是否完成
-4. 完成当前课程后退出
-'''
+
 def one_course(cid:str,ctype:str,crate:int):
+    '''
+    cid: 课程id
+    ctype: 课程类型
+    crate: 课程总体完成率
+    ----------------------
+    接受一个课程id,执行刷课
+    1. 跳转到对应课程页面
+    2. 进入相应的课程界面
+    3. 循环检验课程是否完成
+    4. 完成当前课程后退出
+    '''
     # 接管浏览器
     cur_page = ChromiumPage()
     # 判定课程类别
@@ -45,25 +51,37 @@ def one_course(cid:str,ctype:str,crate:int):
             <div id="normalModel_nodeList" style="max-height:550px;overflow:auto;">
  			<div class="item-title selected" id="node_27817"><div class="courseName" title="活的马克思主义(上)" style="font-size:13px;">活的马克思主义(上)</div><span class="progressBar progress" style="font-size:12px;" id="progress_27817"><img id="progress_27817_percentImage" src="/js/axsProgress/images/percentImage.png" alt="100" style="width: 70px;height:12px;background-position: -50px 50%;background-image: url(/js/axsProgress/images/percentImage_back1.png);padding: 0;margin: 0;" class="percentImage" title="100%"> <span id="progress_27817_percentText" class="percentText" style="font-size:13px;">100%</span></span></div><div class="item-title" id="node_27821"><div class="courseName" title="活的马克思主义(下)" style="font-size:13px;">活的马克思主义(下)</div><span class="progressBar progress" style="font-size:12px;" id="progress_27821"><img id="progress_27821_percentImage" src="/js/axsProgress/images/percentImage.png" alt="100" style="width: 70px;height:12px;background-position: -50px 50%;background-image: url(/js/axsProgress/images/percentImage_back1.png);padding: 0;margin: 0;" class="percentImage" title="100%"> <span id="progress_27821_percentText" class="percentText" style="font-size:13px;">100%</span></span></div></div>
             '''
-            l = []
             while 1:
                 # todo:想要加一个定时刷新的功能方便释放内存
                 watch_rates = tab.ele('#normalModel_nodeList').eles('tag:span')
+                l = []
                 for watch_rate in watch_rates:
                     l.append(int(watch_rate.text[:-1]))
                 # 取偶数索引
                 l = l[::2]
-                n = len(l)
+                infol = [str(i)+'%' for i in l]
+                logger.info('当前各个视频完成率:{}'.format(infol))
                 if l == [100]*len(l):
                     # 关闭当前标签页
+                    logger.warning('当前课程已完成,当前标签页即将关闭')
+                    time.sleep(1)
                     cur_page.close_tabs(tabs_or_ids=[tab])
+                    break
                 '''
                 由于视频播完后会自动暂停，所以需要检测是否播放完毕以准备下一步操作
-                解决方案：检测列表中首个不是0的元素的索引，根据索引点击对应的视频，并尝试检测是否有播放按钮来区分正在播放和播放完毕
+                解决方案:检测列表中首个不是100的元素的索引,根据索引点击对应的视频,并尝试检测是否有播放按钮来区分正在播放和播放完毕
                 '''
-                # 睡觉了，明天继续:)
+                for i in l:
+                    if i != 100:
+                        tab.ele('#normalModel_nodeList').eles('tag:div')[l.index(i)].click()
+                        time.sleep(1)
+                        try:
+                            if tab.ele('c:#normalModel_video > xg-start > div.xgplayer-icon-play > svg > path',timeout=2):
+                                tab.ele('c:#normalModel_video > xg-start > div.xgplayer-icon-play > svg > path').click()
+                        except:
+                            pass
                 time.sleep(60) # 每次监测间隔60秒
 
-            break
+            break # なぜここにbreakがいるのですか？あかしいなあ。
 if __name__ == '__main__':
     one_course('6992','培训',68)
