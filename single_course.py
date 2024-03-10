@@ -4,7 +4,7 @@ import time
 from loguru import logger
 # 实现单个课程的刷课逻辑
 
-def one_course(cid:str,ctype:str,crate:int):
+def one_course(cid:str,ctype:str,crate:int,again:bool=False):
     '''
     cid: 课程id
     ctype: 课程类型
@@ -18,6 +18,9 @@ def one_course(cid:str,ctype:str,crate:int):
     '''
     # 接管浏览器
     cur_page = ChromiumPage()
+    if again:
+        # 关闭所有标签页和浏览器
+        cur_page.close()
     # 判定课程类别
     if ctype == '必修':
         cur_page.ele('@value=1').click()
