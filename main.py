@@ -4,6 +4,9 @@ from collections import *
 from loguru import logger
 import subprocess
 from typing import *
+from DrissionPage import ChromiumPage
+from DrissionPage.common import *
+import time
 # 获取课程信息
 get_info()
 # 执行刷课
@@ -15,11 +18,10 @@ kill_course()
 1. 对于必修课存在3种情况:未完成，已完成，未答题
 2. 对于其他课存在3种情况:未完成，已完成，未评分
 '''
-
 # 重新获取课程信息
 def new_info() -> DefaultDict[str, List[Tuple[str,int,str]]]:
-    get_info()
-    new_info = json.load(open('info.json','r'))
+    get_info(first=False)
+    new_info = json.load(open('course_info.json','r'))
     # 读取各个类别的课程状态
     new_cnt = defaultdict(list)
     for k, v in new_info.items():
@@ -42,20 +44,44 @@ new_cnt = new_info()
 not_judged = []
 not_quiz = []
 for k, v in new_cnt.items():
-    if v['status'] == '已完成':
-        continue
-    if v['status'] == '未评分':
-        not_judged.append(k)
-    else:
-        not_quiz.append(k)
+    for i in v:
+        if i[2] == '未评分':
+            not_judged.append((i[0],k))
+        elif i[2] == '未答题':
+            not_quiz.append(i[0],k)
 
 # 展示提示信息
 for i in not_judged:
     logger.warning('存在未评分的课程:{}'.format(i))
 # 实现自动评分
-def auto_judge(course_id:str) -> None:
+def auto_judge(course_id:str,course_type:str) -> None:
+    # 根据课程类型和id进行定位
+    j_page = ChromiumPage() # 接管当前页面
+    # 判定课程类别
+    if course_type == '必修':
+        j_page.ele('@value=1').click()
+    elif course_type == '选修':
+        j_page.ele('@value=2').click()
+    elif course_type == '专题':
+        j_page.ele('@value=4').click()
+    elif course_type == '培训':
+        j_page.ele('@value=5').click()
+    time.sleep(1)
+    trs = j_page.ele('#tbody').eles('tag:tr')
+    for tr in trs:
+        # 鉴别课程序号
+        if tr.ele('tag:td').text.split('\t')[0] == course_id:
+            # 进入评分页面
+            tr.ele('tag:button@@text():进入评分').click()
+            j_page.ele('x://*[@id="gradeDetail_score"]/label[1]/input').click()
+            j_page.ele('tag:a@@text():保存').click()
+            time.sleep(1)
     pass
+print(not_judged)
+# 实现自动评分
 for i in not_judged:
-    logger.warning('存在未答题的课程:{}'.format(i))
+    auto_judge(i[0],i[1])
+    logger.info('已完成对课程:{}的评分'.format(i[0]))
 # 实现自动答题
-pass
+def auto_quiz(course_id:str) -> None:
+    pass

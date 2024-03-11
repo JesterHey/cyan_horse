@@ -12,7 +12,10 @@ def kill_course(again:bool=False):
     for k, v in info.items():
         if v['rate'] < 100:
             cnt[v['type']].append((k,v['rate'])) # 课程类型作为键，课程id作为值
-    print(cnt)
+    logger.info('{}'.format(cnt))
+    if not cnt:
+        logger.info('所有课程均已完成')
+        return
     # 按必修-选秀-专题-培训执行刷课
     must = cnt['必修']
     elective = cnt['选修']

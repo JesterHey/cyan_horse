@@ -82,17 +82,18 @@ def one_course(cid:str,ctype:str,crate:int,again:bool=False):
                         tab.ele('tag:a@@text():是').click()
                 except:
                     pass
-                # 有时候没有弹窗提示，用以下方式手动检测
-                for i in l:
-                    if i != 100:
-                        tab.ele('#normalModel_nodeList').eles('tag:div')[l.index(i)].click()
-                        time.sleep(1)
-                        try:
-                            if tab.ele('c:#normalModel_video > xg-start > div.xgplayer-icon-play > svg > path',timeout=2):
-                                tab.ele('c:#normalModel_video > xg-start > div.xgplayer-icon-play > svg > path').click()
-                        except:
-                            pass
-                time.sleep(60) # 每次监测间隔60秒
+                finally:
+                    # 有时候没有弹窗提示，用以下方式手动检测
+                    for i in l:
+                        if i != 100:
+                            tab.ele('#normalModel_nodeList').eles('tag:div')[l.index(i)+1].click()
+                            time.sleep(1)
+                            try:
+                                if tab.ele('c:#normalModel_video > xg-start > div.xgplayer-icon-play > svg > path',timeout=2):
+                                    tab.ele('c:#normalModel_video > xg-start > div.xgplayer-icon-play > svg > path').click()
+                            except:
+                                pass
+                    time.sleep(60) # 每次监测间隔60秒
 
             break # なぜここにbreakがいるのですか？あかしいなあ。
 if __name__ == '__main__':
