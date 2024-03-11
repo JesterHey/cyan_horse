@@ -1,4 +1,4 @@
-from DrissionPage import WebPage
+from DrissionPage import ChromiumPage,ChromiumOptions
 from DrissionPage.common import *
 from collections import *
 import time
@@ -12,7 +12,7 @@ def login(first:bool=True):
     if not first:
         return
     # 先检查当前页面是否已经登录
-    page = WebPage()
+    page = ChromiumPage()
     try:
         if page.ele('tag:div@@text():欢迎您，',timeout=3):
             logger.info('当前页面已登录')
@@ -52,7 +52,7 @@ def login(first:bool=True):
         page.ele('@value=进入个人中心').click()
 def get_info(first:bool=True):
     # 创建页面对象，并启动或接管浏览器
-    page = WebPage()
+    page = ChromiumPage()
     # 登录
     login(first)
     # 提取课程信息
@@ -66,6 +66,7 @@ def get_info(first:bool=True):
     # <div class="paginationjs-nav J-paginationjs-nav">1 / 4</div>
     # total_page = int(page.ele('.paginationjs-nav J-paginationjs-nav').text)
     total_page = 4
+    logger.debug('读取课程信息中...')
     for i in range(total_page):
         # 逐页读取课程信息和完成状态并存放到字典中
         tbodys = page.ele('#tbody')
@@ -77,13 +78,12 @@ def get_info(first:bool=True):
             course_type = cur_info[2] # 课程类型
             course_rate = int(cur_info[3][:-1])  # 课程完成百分比
             course_status = cur_info[4]  # 课程完成状态(是否完成习题/评价)
-            logger.info('课程id:{}|课程类型:{}|课程完成率:{}|课程完成状态:{}'.format(course_id,course_type,course_rate,course_status))
             # 存放到字典中
             course_info[course_id] = {'rate': course_rate,'type': course_type,'status': course_status}
         if i != total_page - 1:
             page.ele('@title=Next page').click()
             time.sleep(1)
-    print(len(course_info))
+    logger.success('课程信息读取完成,共有{}门课程'.format(len(course_info)))
     # 写入json文件中
     with open('course_info.json', 'w') as f:
         json.dump(course_info, f)

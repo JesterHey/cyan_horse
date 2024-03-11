@@ -33,7 +33,7 @@ new_cnt = new_info()
 for k, v in new_cnt.items():
     for i in v:
         if i[1] < 100:
-            logger.critical('存在未完成的课程:{}! 将重新执行刷课'.format(i[0]))
+            logger.error('存在未完成的课程:{}! 将重新执行刷课'.format(i[0]))
             # 完全关闭进程并重新执行刷课
             kill_course(again=True)
             subprocess.run(["python", __file__])
@@ -50,9 +50,7 @@ for k, v in new_cnt.items():
         elif i[2] == '未答题':
             not_quiz.append(i[0],k)
 
-# 展示提示信息
-for i in not_judged:
-    logger.warning('存在未评分的课程:{}'.format(i))
+
 # 实现自动评分
 def auto_judge(course_id:str,course_type:str) -> None:
     # 根据课程类型和id进行定位
@@ -77,11 +75,41 @@ def auto_judge(course_id:str,course_type:str) -> None:
             j_page.ele('tag:a@@text():保存').click()
             time.sleep(1)
     pass
-print(not_judged)
 # 实现自动评分
-for i in not_judged:
-    auto_judge(i[0],i[1])
-    logger.info('已完成对课程:{}的评分'.format(i[0]))
-# 实现自动答题
+if not_judged:
+    for i in not_judged:
+        logger.info('正在对课程:{}进行评分'.format(i[0]))
+        auto_judge(i[0],i[1])
+        logger.success('已完成对课程:{}的评分'.format(i[0]))
+else:
+    logger.info('没有需要评分的课程')
+# 实现题目答案显示
 def auto_quiz(course_id:str) -> None:
     pass
+if not_quiz:
+    for i in not_quiz:
+        logger.info('正在获取课程:{}的答案'.format(i[0]))
+        auto_quiz(i[0])
+        logger.success('已完成对课程:{}的答案获取'.format(i[0]))
+else:
+    logger.info('没有需要答题的课程')
+
+# 重新检验是否存在未评分或者未答题的课程
+logger.debug('正在进行最终检验...')
+time.sleep(2)
+new_cnt = new_info()
+not_judged = []
+not_quiz = []
+for k, v in new_cnt.items():
+    for i in v:
+        if i[2] == '未评分':
+            not_judged.append((i[0],k))
+        elif i[2] == '未答题':
+            not_quiz.append(i[0],k)
+if not not_judged and not not_quiz:
+    logger.warning('所有课程均已完成,页面即将关闭')
+    page = ChromiumPage()
+    page.close_tabs()
+else:
+    subprocess.run(["python", __file__])
+    exit()
