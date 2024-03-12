@@ -8,7 +8,10 @@ from DrissionPage import ChromiumPage
 from DrissionPage.common import *
 import time
 # 获取课程信息
-get_info()
+
+# 这里以后会放一个初始化模块
+
+get_info(first=False)
 # 执行刷课
 from kill_course import kill_course
 kill_course()
