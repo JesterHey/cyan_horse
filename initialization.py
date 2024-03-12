@@ -8,7 +8,7 @@ from DrissionPage import ChromiumPage
 from DrissionPage.common import *
 import json
 import time
-from logru import logger
+from loguru import logger
 from get_info import get_info
 from collections import *
 
@@ -19,3 +19,17 @@ class_info = json.load(open('course_info.json','r'))
 cnt = Counter(class_info[k]['type'] for k in class_info.keys())
 # 检测是否存在小于10的课程数量
 less_10 = [k for k, v in cnt.items() if v < 10]
+def click_videoes():
+    '''
+    进入首页，逐个点击相应视频,每个视频页面停留3秒后推出,并进入下一个视频。
+    '''
+    pass
+if not less_10:
+    # 直接进行刷课和检测
+    pass
+else:
+    '''
+    回到首页,逐个点击相应视频,每个视频页面停留3秒后推出,并进入下一个视频。
+    结束调用get_info()函数，更新课程数量信息
+    '''
+    pass
