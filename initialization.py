@@ -58,5 +58,5 @@ def init():
         login(first=True,init=True)
         page.ele('tag:a@@text():青马课堂').hover()
         page.ele('tag:a@@text():全部').click().for_new_tab()
-    click_videoes()、
+    click_videoes()
     # 今日はこれで終わりです
