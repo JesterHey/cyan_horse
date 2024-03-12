@@ -35,7 +35,7 @@ def click_videoes(study_type:str) -> None:
 # 读取课程数量信息
 def init():
     '''
-    初始化，检测是否需要进入视频一次页以及进行进入视频一次页操作
+    初始化，检测是否需要进入视频一次页以及进行进入视频一次操作
     '''
     # 获取课程数量信息
     get_info()
@@ -58,4 +58,5 @@ def init():
         login(first=True,init=True)
         page.ele('tag:a@@text():青马课堂').hover()
         page.ele('tag:a@@text():全部').click().for_new_tab()
-    click_videoes()
+    click_videoes()、
+    # 今日はこれで終わりです
