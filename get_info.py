@@ -5,10 +5,14 @@ import time
 import json
 from loguru import logger
 import subprocess
+from typing import *
 # http://hnqmgc.17el.cn/grzx/
 
 # 单独实现登录操作
-def login(first:bool=True):
+def get_into_center(cpage:ChromiumPage):
+        cpage.ele('#login_btn').click()
+        cpage.ele('@value=进入个人中心').click()
+def login(first:bool=True,init:bool=False):
     if not first:
         return
     # 先检查当前页面是否已经登录
@@ -48,8 +52,8 @@ def login(first:bool=True):
             logger.error('不能进入课程页面')
             subprocess.run(["python", __file__])
             exit()
-        page.ele('#login_btn').click()
-        page.ele('@value=进入个人中心').click()
+        if not init:
+            get_into_center(page)
 def get_info(first:bool=True):
     # 创建页面对象，并启动或接管浏览器
     page = ChromiumPage()
