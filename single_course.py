@@ -92,7 +92,7 @@ def one_course(cid: str, ctype: str, crate: int, again: bool = False):
                     for i in l:
                         if i != 100:
                             tab.ele('#normalModel_nodeList').eles(
-                                'tag:div')[l.index(i)+1].click()
+                                'tag:div')[l.index(i)].click()
                             time.sleep(1)
                             try:
                                 if tab.ele('c:#normalModel_video > xg-start > div.xgplayer-icon-play > svg > path', timeout=2):
