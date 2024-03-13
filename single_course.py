@@ -2,6 +2,7 @@ from DrissionPage import ChromiumPage
 from DrissionPage.common import *
 import time
 from loguru import logger
+from get_info import get_into_center
 # 实现单个课程的刷课逻辑
 
 
@@ -22,6 +23,8 @@ def one_course(cid: str, ctype: str, crate: int, again: bool = False):
     if again:
         # 关闭所有标签页和浏览器
         cur_page.close()
+    # 进入个人中心
+    get_into_center(cur_page)
     # 判定课程类别
     if ctype == '必修':
         cur_page.ele('@value=1').click()

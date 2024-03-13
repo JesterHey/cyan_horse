@@ -18,7 +18,6 @@ if not os.path.exists('info.json'):
 study_type = json.load(open('info.json', 'r'))['study_type']
 
 # 这里以后会放一个初始化模块
-get_info(first=True)
 init(study_type=study_type)
 # 执行刷课
 kill_course()
