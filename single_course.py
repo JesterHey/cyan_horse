@@ -4,7 +4,8 @@ import time
 from loguru import logger
 # 实现单个课程的刷课逻辑
 
-def one_course(cid:str,ctype:str,crate:int,again:bool=False):
+
+def one_course(cid: str, ctype: str, crate: int, again: bool = False):
     '''
     cid: 课程id
     ctype: 课程类型
@@ -38,17 +39,18 @@ def one_course(cid:str,ctype:str,crate:int,again:bool=False):
         if tr.ele('tag:td').text.split('\t')[0] == cid:
             # 进入视频页面
             tr.ele('tag:button@@text():进入学习').click()
-            cur_page.wait.new_tab(timeout=3) # 等待新标签页出现
-            tab = cur_page.get_tab(cur_page.latest_tab) # 获取新标签页
+            cur_page.wait.new_tab(timeout=3)  # 等待新标签页出现
+            tab = cur_page.get_tab(cur_page.latest_tab)  # 获取新标签页
             time.sleep(1)
             if crate == 100:
                 print('当前课程已完成')
                 cur_page.close_tabs(tabs_or_ids=[tab])
             # 进入后，获得当前视频的完成率,决定操作方式
-            if tab.ele('tag:a@@text():继续学习',timeout=2):
+            if tab.ele('tag:a@@text():继续学习', timeout=2):
                 tab.ele('tag:a@@text():继续学习').click()
             else:
-                tab.ele('c:#normalModel_video > xg-start > div.xgplayer-icon-play > svg > path').click()
+                tab.ele(
+                    'c:#normalModel_video > xg-start > div.xgplayer-icon-play > svg > path').click()
             # 建立循环，检测当前视频是否完播
             '''
             <div id="normalModel_nodeList" style="max-height:550px;overflow:auto;">
@@ -78,7 +80,7 @@ def one_course(cid:str,ctype:str,crate:int,again:bool=False):
 
                 # 每60秒先检测是否有视频播放完毕
                 try:
-                    if tab.ele('tag:div@@text():本小结已经学习完，是否进入下一节？',timeout=2):
+                    if tab.ele('tag:div@@text():本小结已经学习完，是否进入下一节？', timeout=2):
                         tab.ele('tag:a@@text():是').click()
                 except:
                     pass
@@ -86,15 +88,19 @@ def one_course(cid:str,ctype:str,crate:int,again:bool=False):
                     # 有时候没有弹窗提示，用以下方式手动检测
                     for i in l:
                         if i != 100:
-                            tab.ele('#normalModel_nodeList').eles('tag:div')[l.index(i)+1].click()
+                            tab.ele('#normalModel_nodeList').eles(
+                                'tag:div')[l.index(i)+1].click()
                             time.sleep(1)
                             try:
-                                if tab.ele('c:#normalModel_video > xg-start > div.xgplayer-icon-play > svg > path',timeout=2):
-                                    tab.ele('c:#normalModel_video > xg-start > div.xgplayer-icon-play > svg > path').click()
+                                if tab.ele('c:#normalModel_video > xg-start > div.xgplayer-icon-play > svg > path', timeout=2):
+                                    tab.ele(
+                                        'c:#normalModel_video > xg-start > div.xgplayer-icon-play > svg > path').click()
                             except:
                                 pass
-                    time.sleep(60) # 每次监测间隔60秒
+                    time.sleep(60)  # 每次监测间隔60秒
 
-            break # なぜここにbreakがいるのですか？あかしいなあ。
+            break  # なぜここにbreakがいるのですか？あかしいなあ。
+
+
 if __name__ == '__main__':
-    one_course('6992','培训',68)
+    one_course('6992', '培训', 68)

@@ -4,14 +4,16 @@ from collections import *
 import json
 from single_course import one_course
 from loguru import logger
-def kill_course(again:bool=False):
+
+
+def kill_course(again: bool = False):
     # 统计课程完成情况
     cnt = defaultdict(list)
     # 读取课程信息
     info = json.load(open('course_info.json', 'r'))
     for k, v in info.items():
         if v['rate'] < 100:
-            cnt[v['type']].append((k,v['rate'])) # 课程类型作为键，课程id作为值
+            cnt[v['type']].append((k, v['rate']))  # 课程类型作为键，课程id作为值
     logger.info('{}'.format(cnt))
     if not cnt:
         logger.info('所有课程均已完成')
@@ -29,15 +31,16 @@ def kill_course(again:bool=False):
         if elective:
             course_info = elective.pop()
             logger.info('当前刷课序号:{}'.format(course_info[0]))
-            one_course(course_info[0], '选修', course_info[1],again=again)
+            one_course(course_info[0], '选修', course_info[1], again=again)
         if special:
             course_info = special.pop()
             logger.info('当前刷课序号:{}'.format(course_info[0]))
-            one_course(course_info[0], '专题', course_info[1],again=again)
+            one_course(course_info[0], '专题', course_info[1], again=again)
         if train:
             course_info = train.pop()
             logger.info('当前刷课序号:{}'.format(course_info[0]))
-            one_course(course_info[0], '培训', course_info[1],again=again)
+            one_course(course_info[0], '培训', course_info[1], again=again)
+
 
 if __name__ == '__main__':
     kill_course()
