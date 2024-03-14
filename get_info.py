@@ -37,16 +37,21 @@ def login(first: bool = True, init: bool = False, username: str = None, pwd: str
 
         # 定位到账号文本框，获取文本框元素
         ele = page.ele('#userName')  # 的意思是通过id定位元素
-        # 输入对文本框输入账号
-        ele.input(username)
-        # 定位到密码文本框并输入密码
-        page.ele('#password').input(pwd)
-        # 定位到验证码文本框并输入验证码
-        inpcode = page.ele('#yzcode').text  # 湖南青马太可爱了吧，验证码居然直接放在页面源码里:)
-        page.ele('#inpcode').input(inpcode)
-        # 点击登录按钮
-        page.ele('#btnLogin').click()
-        page.wait.new_tab(3)
+        try:
+            # 输入对文本框输入账号
+            ele.input(username)
+            # 定位到密码文本框并输入密码
+            page.ele('#password').input(pwd)
+            # 定位到验证码文本框并输入验证码
+            inpcode = page.ele('#yzcode').text  # 湖南青马太可爱了吧，验证码居然直接放在页面源码里:)
+            page.ele('#inpcode').input(inpcode)
+            # 点击登录按钮
+            page.ele('#btnLogin').click()
+            page.wait.new_tab(3)
+            if page.ele('@onclick=cha()',timeout=3):
+                pass
+        except BaseException:
+            logger.error('登录错误，请检查输入的账号密码是否正确！')
         # 进入课程页面
         try:
             if page.ele('@onclick=cha()', timeout=3):

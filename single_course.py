@@ -49,11 +49,14 @@ def one_course(cid: str, ctype: str, crate: int, again: bool = False):
                 print('当前课程已完成')
                 cur_page.close_tabs(tabs_or_ids=[tab])
             # 进入后，获得当前视频的完成率,决定操作方式
-            if tab.ele('tag:a@@text():继续学习', timeout=2):
-                tab.ele('tag:a@@text():继续学习').click()
-            else:
-                tab.ele(
-                    'c:#normalModel_video > xg-start > div.xgplayer-icon-play > svg > path').click()
+            try:
+                if tab.ele('tag:a@@text():继续学习', timeout=2):
+                    tab.ele('tag:a@@text():继续学习').click()
+                else:
+                    tab.ele(
+                        'c:#normalModel_video > xg-start > div.xgplayer-icon-play > svg > path').click()
+            except BaseException:
+                pass
             # 建立循环，检测当前视频是否完播
             '''
             <div id="normalModel_nodeList" style="max-height:550px;overflow:auto;">
@@ -85,14 +88,17 @@ def one_course(cid: str, ctype: str, crate: int, again: bool = False):
                 try:
                     if tab.ele('tag:div@@text():本小结已经学习完，是否进入下一节？', timeout=2):
                         tab.ele('tag:a@@text():是').click()
-                except:
+                except BaseException:
                     pass
                 finally:
                     # 有时候没有弹窗提示，用以下方式手动检测
                     for i in l:
                         if i != 100:
-                            tab.ele('#normalModel_nodeList').eles(
-                                'tag:div')[l.index(i)].click()
+                            pers = tab.eles('.percentText')
+                            for p in pers:
+                                if int(p.text[:-1]) < 100:
+                                    p.click()
+                                    break
                             time.sleep(1)
                             try:
                                 if tab.ele('c:#normalModel_video > xg-start > div.xgplayer-icon-play > svg > path', timeout=2):
@@ -101,6 +107,7 @@ def one_course(cid: str, ctype: str, crate: int, again: bool = False):
                             except:
                                 pass
                     time.sleep(60)  # 每次监测间隔60秒
+                    
 
             break  # なぜここにbreakがいるのですか？あかしいなあ。
 
