@@ -12,7 +12,8 @@ def kill_course(again: bool = False):
     # 读取课程信息
     info = json.load(open('course_info.json', 'r'))
     # 统计各个类别的课程 = 100的数量
-    cnt2 = Counter(info[k]['type'] for k in info.keys() if info[k]['rate'] == 100)
+    cnt2 = Counter(info[k]['type']
+                   for k in info.keys() if info[k]['rate'] == 100)
     for k, v in info.items():
         if v['rate'] < 100 and cnt2[v['type']] < 10:
             cnt[v['type']].append((k, v['rate']))  # 课程类型作为键，课程id作为值
